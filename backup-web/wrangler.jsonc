@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "garmin-backup",
+  "account_id": "9de1fafa385bf6e8ba925ef000f5669b",
+  "main": "worker.ts",
+  "compatibility_date": "2026-05-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "routes": [{ "pattern": "backup.execureach.co", "custom_domain": true }],
+  "durable_objects": { "bindings": [{ "name": "BACKUP_TRANSFERS", "class_name": "BackupTransferObject" }] },
+  "migrations": [{ "tag": "backup-v1", "new_sqlite_classes": ["BackupTransferObject"] }]
+}

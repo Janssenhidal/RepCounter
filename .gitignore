@@ -1,0 +1,36 @@
+# Garmin build output and signing material
+/bin/
+*.prg
+*.iq
+*.debug.xml
+*.mir
+*.pem
+*.der
+*.key
+developer_key*
+
+# Local editor and tooling state
+/.vscode/
+**/.openai/
+**/.codex/
+**/.wrangler/
+**/.env*
+**/.dev.vars*
+*.log
+*.tsbuildinfo
+.DS_Store
+Thumbs.db
+
+# Dependencies and generated web output
+**/node_modules/
+**/.next/
+**/.vinext/
+**/dist/
+**/coverage/
+
+# Local backup and device data
+/backups/
+/exports/
+*.DAT
+*.IDX
+*.IMT
