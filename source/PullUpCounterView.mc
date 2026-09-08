@@ -76,7 +76,7 @@ class PullUpCounterView extends WatchUi.View {
         var cyan = 0x40d6d6;
         var align = Graphics.TEXT_JUSTIFY_CENTER;
         dc.setColor(cyan, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(centerX, 35, Graphics.FONT_XTINY, "COUNTER", align);
+        dc.drawText(centerX, 35, Graphics.FONT_XTINY, "REPS", align);
 
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
         var countText = pullUps.format("%d");
