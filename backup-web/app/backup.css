@@ -187,3 +187,8 @@ input::file-selector-button {
     width: 100%;
   }
 }
+
+.privacy-page h2 { margin-top: 32px; }
+.privacy-page a, footer a { color: #b7e389; text-underline-offset: 3px; }
+.privacy-page header { gap: 16px; }
+.privacy-page p { overflow-wrap: anywhere; }

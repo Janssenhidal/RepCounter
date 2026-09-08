@@ -1,4 +1,6 @@
+/* eslint-disable next/no-html-link-for-pages -- Use full document navigation until client routing is reliable. */
 'use client';
+// eslint-disable-next-line next/no-html-link-for-pages -- Document navigation avoids a vinext client-router failure.
 import { useCallback, useEffect, useState } from 'react';
 import { validateBackup, csv } from '../lib/backup.mjs';
 
@@ -272,8 +274,11 @@ export default function Home() {
       <footer>
         Transfers expire after 15 minutes and are removed from active storage.
         Cloudflare may retain platform recovery copies. Keep downloaded backups
-        somewhere safe.
+        somewhere safe. <a href="/privacy">Privacy policy</a>
       </footer>
     </main>
   );
 }
+
+
+
