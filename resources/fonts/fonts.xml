@@ -1,0 +1,6 @@
+<resources>
+  <font id="RepNumber" filename="RepNumber.fnt" antialias="true" />
+  <font id="RepTimer" filename="RepTimer.fnt" antialias="true" />
+  <font id="RepLabel" filename="RepLabel.fnt" antialias="true" />
+  <font id="RepFooter" filename="RepFooter.fnt" antialias="true" />
+</resources>

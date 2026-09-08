@@ -3,6 +3,7 @@ import Toybox.WatchUi;
 using Toybox.Application;
 using Toybox.Lang;
 using Toybox.Time;
+using Toybox.Math;
 
 class PullUpCounterView extends WatchUi.View {
     var pullUps = 0;
@@ -14,7 +15,10 @@ class PullUpCounterView extends WatchUi.View {
     var history as Lang.Array = [];
     var totalSets = 0;
     var vibrationEnabled = true;
-    var background;
+    var numberFont;
+    var timerFont;
+    var labelFont;
+    var footerFont;
     var workoutStore as WorkoutStore;
     var workoutReady = true;
 
@@ -22,7 +26,10 @@ class PullUpCounterView extends WatchUi.View {
         View.initialize();
 
         workoutStore = new WorkoutStore(new WorkoutStorage());
-        background = WatchUi.loadResource(Rez.Drawables.background);
+        numberFont = WatchUi.loadResource(Rez.Fonts.RepNumber);
+        timerFont = WatchUi.loadResource(Rez.Fonts.RepTimer);
+        labelFont = WatchUi.loadResource(Rez.Fonts.RepLabel);
+        footerFont = WatchUi.loadResource(Rez.Fonts.RepFooter);
         workoutReady = false;
         try {
             workoutStore = new WorkoutStore(
@@ -52,7 +59,6 @@ class PullUpCounterView extends WatchUi.View {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         dc.clear();
 
-        dc.drawBitmap(0, 0, background);
         if (!workoutReady) {
             dc.drawText(
                 dc.getWidth() / 2,
@@ -71,67 +77,101 @@ class PullUpCounterView extends WatchUi.View {
             return;
         }
 
-        var centerX = dc.getWidth() / 2;
-        var centerY = dc.getHeight() / 2;
-        var cyan = 0x40d6d6;
+        var x = dc.getWidth() / 2;
+        var y = dc.getHeight() / 2;
+        var radius = x - 23;
+        var cyan = 0x00dce5;
+        dc.setColor(0x586467, Graphics.COLOR_TRANSPARENT);
+        dc.setPenWidth(2);
+        dc.drawCircle(x, y, x - 6);
+        // The track runs from bottom-left over the top to bottom-right.
+        var ringStart = 240;
+        var ringSweep = 300;
+        roundedRestArc(dc, x, y, radius, ringStart, ringSweep, 0x202b2d);
+        if (restSeconds > 0 && restDuration > 0) {
+            var sweep = (restSeconds.toFloat() / restDuration) * ringSweep;
+            if (sweep > ringSweep) {
+                sweep = ringSweep;
+            }
+            // Clear elapsed time from the left, keeping the cyan end at bottom-right.
+            var countdownStart = ringStart - (ringSweep - sweep);
+            roundedRestArc(dc, x, y, radius, countdownStart, sweep, cyan);
+        }
         var align = Graphics.TEXT_JUSTIFY_CENTER;
         dc.setColor(cyan, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(centerX, 35, Graphics.FONT_XTINY, "REPS", align);
-
+        dc.drawText(x, 68, labelFont, "REPS", align);
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-        var countText = pullUps.format("%d");
-        var countFont = Graphics.FONT_NUMBER_HOT;
-        if (
-            dc.getTextWidthInPixels(countText, countFont) >
-            dc.getWidth() - 80
-        ) {
-            countFont = Graphics.FONT_NUMBER_MEDIUM;
+        var text = pullUps.format("%d");
+        var font = numberFont;
+        if (dc.getTextWidthInPixels(text, font) > dc.getWidth() - 100) {
+            font = timerFont;
         }
-        dc.drawText(centerX, 75, countFont, countText, align);
-        dc.setColor(cyan, Graphics.COLOR_TRANSPARENT);
+        if (dc.getTextWidthInPixels(text, font) > dc.getWidth() - 100) {
+            font = labelFont;
+        }
         dc.drawText(
-            centerX,
-            197,
-            Graphics.FONT_XTINY,
-            "SET " + totalSets.format("%d"),
+            x,
+            102 + (116 - dc.getFontHeight(font)) / 2,
+            font,
+            text,
             align
         );
-
-        // Dim track remains visible; the cyan arc counts down during rest.
-        dc.setPenWidth(4);
-        dc.setColor(0x123838, Graphics.COLOR_TRANSPARENT);
-        dc.drawCircle(centerX, centerY, centerX - 8);
         dc.setColor(cyan, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(x, 232, labelFont, "SET " + totalSets.format("%d"), align);
         if (restSeconds > 0) {
-            var progress = (restSeconds * 359) / restDuration;
-            if (progress > 359) {
-                progress = 359;
-            }
-            dc.drawArc(
-                centerX,
-                centerY,
-                centerX - 8,
-                Graphics.ARC_CLOCKWISE,
-                90,
-                90 - progress
-            );
-            var timerText =
+            var timer =
                 (restSeconds / 60).format("%02d") +
                 ":" +
                 (restSeconds % 60).format("%02d");
-            dc.drawText(centerX, 232, Graphics.FONT_LARGE, timerText, align);
-            dc.drawText(centerX, 279, Graphics.FONT_XTINY, "REST", align);
+            var restFont = timerFont;
+            if (
+                dc.getTextWidthInPixels(timer, restFont) >
+                dc.getWidth() - 100
+            ) {
+                restFont = labelFont;
+            }
+            dc.drawText(x, 260, restFont, timer, align);
+            dc.drawText(x, 311, labelFont, "REST", align);
         } else {
-            dc.drawText(centerX, 240, Graphics.FONT_MEDIUM, "READY", align);
+            dc.drawText(x, 280, labelFont, "READY", align);
         }
-        dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-        var settingsText =
+        dc.setColor(0xaaaaaa, Graphics.COLOR_TRANSPARENT);
+        dc.drawText(
+            x,
+            344,
+            footerFont,
             "+" +
-            incrementAmount.format("%d") +
-            " / " +
-            restDuration.format("%d") +
-            "s REST";
-        dc.drawText(centerX, 322, Graphics.FONT_XTINY, settingsText, align);
+                incrementAmount.format("%d") +
+                " / " +
+                restDuration.format("%d") +
+                "s REST",
+            align
+        );
+    }
+
+    function roundedRestArc(dc, x, y, radius, start, sweep, color) as Void {
+        dc.setColor(color, Graphics.COLOR_TRANSPARENT);
+        dc.setPenWidth(13);
+        dc.drawArc(
+            x,
+            y,
+            radius,
+            Graphics.ARC_CLOCKWISE,
+            start,
+            (start - sweep + 360).toNumber() % 360
+        );
+        var startRadians = (start * Math.PI) / 180;
+        dc.fillCircle(
+            x + radius * Math.cos(startRadians),
+            y - radius * Math.sin(startRadians),
+            6
+        );
+        var radians = ((start - sweep) * Math.PI) / 180;
+        dc.fillCircle(
+            x + radius * Math.cos(radians),
+            y - radius * Math.sin(radians),
+            6
+        );
     }
     function onHide() as Void {}
 
