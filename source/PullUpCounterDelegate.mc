@@ -33,56 +33,17 @@ class PullUpCounterDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onMenu() {
-        var minutes = view.restDuration / 60;
-        var seconds = view.restDuration % 60;
-
-        var restText = minutes.format("%d") + ":" + seconds.format("%02d");
-
-        var menu = new WatchUi.Menu2({
-            :title => "Settings",
-        });
-
+        var menu = new WatchUi.Menu2({ :title => "Menu" });
         menu.addItem(
-            new WatchUi.MenuItem(
-                "Increment",
-                view.incrementAmount.format("%d"),
-                :increment,
-                {}
-            )
+            new WatchUi.MenuItem("Workout Settings", null, :workoutSettings, {})
         );
-
-        menu.addItem(
-            new WatchUi.MenuItem("Rest Time", restText, :restTime, {})
-        );
-
-        menu.addItem(
-            new WatchUi.MenuItem(
-                "Vibration",
-                view.vibrationEnabled ? "On" : "Off",
-                :vibration,
-                {}
-            )
-        );
-
-        menu.addItem(
-            new WatchUi.MenuItem("Finish Workout", null, :finishWorkout, {})
-        );
-
-        menu.addItem(
-            new WatchUi.MenuItem(
-                "History",
-                "Current + completed",
-                :history,
-                {}
-            )
-        );
-
-        menu.addItem(
-            new WatchUi.MenuItem("Reset Counter", null, :resetCounter, {})
-        );
-
-        menu.addItem(new WatchUi.MenuItem("Backup / Export", "Wireless transfer", :backup, {}));
-        view.settingsMenu = menu;
+        if (view.totalSets >= 1) {
+            menu.addItem(
+                new WatchUi.MenuItem("Finish Workout", null, :finishWorkout, {})
+            );
+        }
+        menu.addItem(new WatchUi.MenuItem("History", null, :history, {}));
+        menu.addItem(new WatchUi.MenuItem("Data", null, :data, {}));
 
         WatchUi.pushView(
             menu,

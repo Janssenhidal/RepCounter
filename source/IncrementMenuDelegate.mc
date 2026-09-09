@@ -2,7 +2,6 @@ using Toybox.WatchUi;
 using Toybox.Application;
 
 class IncrementMenuDelegate extends WatchUi.Menu2InputDelegate {
-
     var view;
     var settingsMenu;
 
@@ -14,7 +13,6 @@ class IncrementMenuDelegate extends WatchUi.Menu2InputDelegate {
     }
 
     function onSelect(item) as Void {
-
         var id = item.getId();
 
         if (id == :inc1) {
@@ -29,26 +27,18 @@ class IncrementMenuDelegate extends WatchUi.Menu2InputDelegate {
             view.incrementAmount = 5;
         }
 
-        view.workoutStore.storage.put(
-            "incrementAmount",
-            view.incrementAmount
-        );
+        view.workoutStore.storage.put("incrementAmount", view.incrementAmount);
 
-        // Replace the Increment item in Settings
+        // Refresh Reps per Set in Workout Settings
         var updatedItem = new WatchUi.MenuItem(
-            "Increment",
+            "Reps per Set",
             view.incrementAmount.format("%d"),
             :increment,
             {}
         );
 
-        settingsMenu.updateItem(
-            updatedItem,
-            0
-        );
+        settingsMenu.updateItem(updatedItem, 0);
 
-        WatchUi.popView(
-            WatchUi.SLIDE_RIGHT
-        );
+        WatchUi.popView(WatchUi.SLIDE_RIGHT);
     }
 }

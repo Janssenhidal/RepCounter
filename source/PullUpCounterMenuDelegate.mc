@@ -10,8 +10,24 @@ class PullUpCounterMenuDelegate extends WatchUi.Menu2InputDelegate {
     }
 
     function onSelect(item) as Void {
-        if (item.getId() != :backup && !view.ensureWorkoutReady()) { return; }
-        if (item.getId() == :backup) {
+        if (item.getId() != :backup && item.getId() != :data && !view.ensureWorkoutReady()) { return; }
+        if (item.getId() == :workoutSettings) {
+            var menu = new WatchUi.Menu2({ :title => "Workout Settings" });
+            menu.addItem(new WatchUi.MenuItem("Reps per Set", view.incrementAmount.format("%d"), :increment, {}));
+            var restText = (view.restDuration / 60).format("%d") + ":" + (view.restDuration % 60).format("%02d");
+            menu.addItem(new WatchUi.MenuItem("Rest Time", restText, :restTime, {}));
+            menu.addItem(new WatchUi.MenuItem("Vibration", view.vibrationEnabled ? "On" : "Off", :vibration, {}));
+            if (view.totalSets >= 1) {
+                menu.addItem(new WatchUi.MenuItem("Reset Workout", null, :resetCounter, {}));
+            }
+            // Setting pickers update this submenu when returning from a selection.
+            view.settingsMenu = menu;
+            WatchUi.pushView(menu, new PullUpCounterMenuDelegate(view), WatchUi.SLIDE_LEFT);
+        } else if (item.getId() == :data) {
+            var menu = new WatchUi.Menu2({ :title => "Data" });
+            menu.addItem(new WatchUi.MenuItem("Backup / Export", null, :backup, {}));
+            WatchUi.pushView(menu, new PullUpCounterMenuDelegate(view), WatchUi.SLIDE_LEFT);
+        } else if (item.getId() == :backup) {
             if (BackupConfig.URL.equals("")) {
                 workoutMessage("Backup service\nnot configured yet.");
                 return;
@@ -22,7 +38,7 @@ class PullUpCounterMenuDelegate extends WatchUi.Menu2InputDelegate {
             } catch (error) { workoutMessage("Cannot start backup."); }
         } else if (item.getId() == :increment) {
             var menu = new WatchUi.Menu2({
-                :title => "Increment",
+                :title => "Reps per Set",
             });
 
             menu.addItem(new WatchUi.MenuItem("1", null, :inc1, {}));
@@ -92,6 +108,8 @@ class PullUpCounterMenuDelegate extends WatchUi.Menu2InputDelegate {
         } else if (item.getId() == :resetCounter) {
             view.resetCounter();
 
+            // Return to the counter so the next menu reflects the empty workout.
+            WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
             WatchUi.popView(WatchUi.SLIDE_DOWN);
         }
     }
