@@ -64,7 +64,7 @@ class GoalMenu extends WatchUi.Menu2 {
                     :goal,
                     {}
                 ),
-                4
+                3
             );
             view.settingsMenu.updateItem(
                 new WatchUi.MenuItem(

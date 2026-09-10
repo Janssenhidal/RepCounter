@@ -53,6 +53,7 @@ class PullUpCounterView extends WatchUi.View {
         incrementAmount = preferences["increment"];
         restDuration = preferences["rest"];
         vibrationEnabled = preferences["vibration"];
+        AppTheme.selected = preferences["theme"];
         workoutMode = preferences["mode"];
         workoutGoal = preferences["goal"] as Lang.Dictionary;
         if (workoutGoal["enabled"]) {
@@ -99,7 +100,7 @@ class PullUpCounterView extends WatchUi.View {
         var x = dc.getWidth() / 2;
         var y = dc.getHeight() / 2;
         var radius = x - 23;
-        var cyan = 0x00dce5;
+        var cyan = AppTheme.color();
         dc.setColor(0x586467, Graphics.COLOR_TRANSPARENT);
         dc.setPenWidth(2);
         dc.drawCircle(x, y, x - 6);

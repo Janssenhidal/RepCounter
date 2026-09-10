@@ -27,10 +27,10 @@ class WorkoutModeMenuDelegate extends WatchUi.Menu2InputDelegate {
         if (wasInterval != view.isInterval()) {
             // Rebuild only the optional tail; preference row indexes stay stable.
             if (wasInterval) {
-                view.settingsMenu.deleteItem(4);
+                view.settingsMenu.deleteItem(3);
             }
             if (view.totalSets >= 1) {
-                view.settingsMenu.deleteItem(4);
+                view.settingsMenu.deleteItem(3);
             }
             if (view.isInterval()) {
                 view.settingsMenu.addItem(

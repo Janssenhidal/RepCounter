@@ -43,6 +43,7 @@ class PullUpCounterDelegate extends WatchUi.BehaviorDelegate {
             );
         }
         menu.addItem(new WatchUi.MenuItem("History", null, :history, {}));
+        menu.addItem(new WatchUi.MenuItem("General", null, :general, {}));
         menu.addItem(new WatchUi.MenuItem("Data", null, :data, {}));
 
         WatchUi.pushView(

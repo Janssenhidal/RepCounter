@@ -32,6 +32,7 @@ class WorkoutBackup {
                 "created" => Time.now().value(), "workouts" => store.count(),
                 "settings" => { "increment" => setting("incrementAmount", 2),
                     "rest" => setting("restDuration", 45), "vibration" => setting("vibrationEnabled", true),
+                    "theme" => AppTheme.normalize(store.storage.get("theme")),
                     "mode" => setting("workoutMode", "fixedRest"),
                     "goal" => WorkoutGoal.validate(store.storage.get("workoutGoal")) },
                 "current" => { "reps" => setting("pullUps", 0), "sets" => setting("totalSets", 0),

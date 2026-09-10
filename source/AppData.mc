@@ -22,7 +22,7 @@ module AppData {
             !(vibration instanceof Lang.Boolean)) {
             throw new Lang.InvalidValueException("Invalid preferences");
         }
-        return { "increment" => increment, "rest" => rest, "vibration" => vibration, "mode" => mode, "goal" => WorkoutGoal.validate(backend.get("workoutGoal")) };
+        return { "increment" => increment, "rest" => rest, "vibration" => vibration, "theme" => AppTheme.normalize(backend.get("theme")), "mode" => mode, "goal" => WorkoutGoal.validate(backend.get("workoutGoal")) };
     }
 
     function session(backend as WorkoutStorage) as Lang.Dictionary {

@@ -39,7 +39,7 @@ class BackupTransfer extends WatchUi.View {
         var x = dc.getWidth() / 2;
         dc.drawText(x, 35, Graphics.FONT_XTINY, "BACKUP / RESTORE", Graphics.TEXT_JUSTIFY_CENTER);
         dc.drawText(x, 75, Graphics.FONT_XTINY, "Open", Graphics.TEXT_JUSTIFY_CENTER);
-        dc.setColor(0x40D6D6, Graphics.COLOR_BLACK);
+        dc.setColor(AppTheme.color(), Graphics.COLOR_BLACK);
         dc.drawText(x, 105, Graphics.FONT_XTINY, "backup.execureach.co", Graphics.TEXT_JUSTIFY_CENTER);
         if (!code.equals("")) {
             dc.setColor(Graphics.COLOR_ORANGE, Graphics.COLOR_BLACK);

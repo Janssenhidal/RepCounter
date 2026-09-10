@@ -60,14 +60,6 @@ class PullUpCounterMenuDelegate extends WatchUi.Menu2InputDelegate {
                     {}
                 )
             );
-            menu.addItem(
-                new WatchUi.MenuItem(
-                    "Vibration",
-                    view.vibrationEnabled ? "On" : "Off",
-                    :vibration,
-                    {}
-                )
-            );
             if (view.isInterval()) {
                 menu.addItem(
                     new WatchUi.MenuItem(
@@ -97,6 +89,11 @@ class PullUpCounterMenuDelegate extends WatchUi.Menu2InputDelegate {
                 new PullUpCounterMenuDelegate(view),
                 WatchUi.SLIDE_LEFT
             );
+        } else if (item.getId() == :general) {
+            var menu = new WatchUi.Menu2({:title => "General"});
+            menu.addItem(new WatchUi.MenuItem("Vibration", view.vibrationEnabled ? "On" : "Off", :vibration, {}));
+            menu.addItem(new WatchUi.MenuItem("Theme", AppTheme.label(), :theme, {}));
+            WatchUi.pushView(menu, new GeneralMenuDelegate(view, menu), WatchUi.SLIDE_LEFT);
         } else if (item.getId() == :data) {
             var menu = new WatchUi.Menu2({ :title => "Data" });
             menu.addItem(
@@ -165,21 +162,6 @@ class PullUpCounterMenuDelegate extends WatchUi.Menu2InputDelegate {
                 new DurationEditorDelegate(editor),
                 WatchUi.SLIDE_LEFT
             );
-        } else if (item.getId() == :vibration) {
-            view.vibrationEnabled = !view.vibrationEnabled;
-
-            view.workoutStore.storage.put(
-                "vibrationEnabled",
-                view.vibrationEnabled
-            );
-
-            var updatedItem = new WatchUi.MenuItem(
-                "Vibration",
-                view.vibrationEnabled ? "On" : "Off",
-                :vibration,
-                {}
-            );
-            view.settingsMenu.updateItem(updatedItem, 3);
         } else if (item.getId() == :history) {
             if (!view.ensureWorkoutReady()) {
                 return;

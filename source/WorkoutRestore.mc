@@ -144,6 +144,7 @@ class WorkoutRestore {
             target.put("incrementAmount", settings["increment"]);
             target.put("restDuration", settings["rest"]);
             target.put("vibrationEnabled", settings["vibration"]);
+            target.put("theme", AppTheme.normalize(settings["theme"]));
             target.put("pullUps", item["reps"]);
             target.put("totalSets", item["sets"]);
             // A restored workout resumes without an obsolete rest timer.

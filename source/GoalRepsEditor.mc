@@ -79,7 +79,7 @@ class RepsEditor extends WatchUi.View {
                 Graphics.TEXT_JUSTIFY_CENTER
             );
             if (i == selected) {
-                dc.setColor(0x00dce5, Graphics.COLOR_TRANSPARENT);
+                dc.setColor(AppTheme.color(), Graphics.COLOR_TRANSPARENT);
                 dc.fillRectangle(center - 20, 232, 40, 3);
                 dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
                 dc.drawText(

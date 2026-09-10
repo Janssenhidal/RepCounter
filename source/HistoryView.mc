@@ -103,7 +103,7 @@ class HistorySetDrawable extends WatchUi.Drawable {
         var y = 8;
         var accentColor = isLatest
             ? Graphics.COLOR_YELLOW
-            : Graphics.COLOR_BLUE;
+            : AppTheme.color();
         var detailColor = isLatest
             ? Graphics.COLOR_WHITE
             : Graphics.COLOR_LT_GRAY;
