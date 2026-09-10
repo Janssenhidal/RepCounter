@@ -33,7 +33,7 @@ class PullUpCounterDelegate extends WatchUi.BehaviorDelegate {
     }
 
     function onMenu() {
-        var menu = new WatchUi.Menu2({ :title => "Menu" });
+        var menu = new WatchUi.Menu2({ :title => new ScreenTitle("Menu") });
         menu.addItem(
             new WatchUi.MenuItem("Workout Settings", null, :workoutSettings, {})
         );

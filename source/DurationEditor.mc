@@ -99,13 +99,7 @@ class DurationEditor extends WatchUi.View {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
         dc.clear();
         var titles = ["Set Hours", "Set Minutes", "Set Seconds"];
-        dc.drawText(
-            x,
-            60,
-            Graphics.FONT_SMALL,
-            titles[selected],
-            Graphics.TEXT_JUSTIFY_CENTER
-        );
+        ScreenStyle.title(dc, titles[selected]);
         var centers = minutesOnly ? [0, x - 70, x + 70] : [x - 94, x, x + 94];
         for (var i = minutesOnly ? 1 : 0; i < 3; i += 1) {
             var text = fields[i].format(i == 0 ? "%d" : "%02d");

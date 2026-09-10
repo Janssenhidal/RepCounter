@@ -34,7 +34,7 @@ class PullUpCounterMenuDelegate extends WatchUi.Menu2InputDelegate {
                 WatchUi.SLIDE_LEFT
             );
         } else if (item.getId() == :workoutSettings) {
-            var menu = new WatchUi.Menu2({ :title => "Workout Settings" });
+            var menu = new WatchUi.Menu2({ :title => new ScreenTitle("Workout Settings") });
             menu.addItem(
                 new WatchUi.MenuItem(
                     "Workout Mode",
@@ -90,12 +90,12 @@ class PullUpCounterMenuDelegate extends WatchUi.Menu2InputDelegate {
                 WatchUi.SLIDE_LEFT
             );
         } else if (item.getId() == :general) {
-            var menu = new WatchUi.Menu2({:title => "General"});
+            var menu = new WatchUi.Menu2({:title => new ScreenTitle("General")});
             menu.addItem(new WatchUi.MenuItem("Vibration", view.vibrationEnabled ? "On" : "Off", :vibration, {}));
             menu.addItem(new WatchUi.MenuItem("Theme", AppTheme.label(), :theme, {}));
             WatchUi.pushView(menu, new GeneralMenuDelegate(view, menu), WatchUi.SLIDE_LEFT);
         } else if (item.getId() == :data) {
-            var menu = new WatchUi.Menu2({ :title => "Data" });
+            var menu = new WatchUi.Menu2({ :title => new ScreenTitle("Data") });
             menu.addItem(
                 new WatchUi.MenuItem("Backup / Export", null, :backup, {})
             );
@@ -120,7 +120,7 @@ class PullUpCounterMenuDelegate extends WatchUi.Menu2InputDelegate {
                 workoutMessage("Cannot start backup.");
             }
         } else if (item.getId() == :workoutMode) {
-            var menu = new WatchUi.Menu2({ :title => "Workout Mode" });
+            var menu = new WatchUi.Menu2({ :title => new ScreenTitle("Workout Mode") });
             menu.addItem(
                 new WatchUi.MenuItem("Fixed Rest", null, :fixedRest, {})
             );

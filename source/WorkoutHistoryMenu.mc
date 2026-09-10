@@ -44,7 +44,7 @@ class WorkoutHistoryMenu extends WatchUi.Menu2 {
     var atNewest = true;
 
     function initialize(view as PullUpCounterView) {
-        Menu2.initialize({ :title => "Workouts" });
+        Menu2.initialize({ :title => new ScreenTitle("Workouts") });
         mainView = view;
         refresh();
     }

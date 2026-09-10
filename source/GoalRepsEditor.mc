@@ -61,13 +61,7 @@ class RepsEditor extends WatchUi.View {
         dc.clear();
         width = dc.getWidth();
         var x = width / 2;
-        dc.drawText(
-            x,
-            60,
-            Graphics.FONT_SMALL,
-            title,
-            Graphics.TEXT_JUSTIFY_CENTER
-        );
+        ScreenStyle.title(dc, title);
         for (var i = 0; i < digits.size(); i += 1) {
             var center = x - (digits.size() - 1) * 28 + i * 56;
             dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);

@@ -48,14 +48,14 @@ class HistoryLabel extends WatchUi.Drawable {
         // Keep the heading close to the first row even when the native menu
         // reserves a taller title region on a round display.
         if (text.equals("HISTORY")) {
-            var y = dc.getHeight() - dc.getFontHeight(Graphics.FONT_SMALL) - 20;
+            var y = dc.getHeight() - dc.getFontHeight(ScreenStyle.TITLE_FONT) - 20;
             if (y < 0) {
                 y = 0;
             }
             dc.drawText(
                 dc.getWidth() / 2,
                 y,
-                Graphics.FONT_SMALL,
+                ScreenStyle.TITLE_FONT,
                 text,
                 Graphics.TEXT_JUSTIFY_CENTER
             );

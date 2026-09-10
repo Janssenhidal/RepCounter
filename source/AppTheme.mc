@@ -21,7 +21,7 @@ class GeneralMenuDelegate extends WatchUi.Menu2InputDelegate {
             view.workoutStore.storage.put("vibrationEnabled", view.vibrationEnabled);
             menu.updateItem(new WatchUi.MenuItem("Vibration", view.vibrationEnabled ? "On" : "Off", :vibration, {}), 0);
         } else {
-            var choices = new WatchUi.Menu2({:title => "Theme"});
+            var choices = new WatchUi.Menu2({:title => new ScreenTitle("Theme")});
             choices.addItem(new WatchUi.MenuItem("Cyan", null, "cyan", {}));
             choices.addItem(new WatchUi.MenuItem("Orange", null, "orange", {}));
             choices.addItem(new WatchUi.MenuItem("Red", null, "red", {}));
@@ -37,7 +37,10 @@ class ThemeMenuDelegate extends WatchUi.Menu2InputDelegate {
         view.workoutStore.storage.put("theme", value);
         AppTheme.selected = value;
         menu.updateItem(new WatchUi.MenuItem("Theme", AppTheme.label(), :theme, {}), 1);
-        WatchUi.popView(WatchUi.SLIDE_RIGHT);
+        // Close Theme, General, and Menu to preview the colour on the counter.
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+        WatchUi.popView(WatchUi.SLIDE_DOWN);
         WatchUi.requestUpdate();
     }
 }

@@ -37,16 +37,16 @@ class BackupTransfer extends WatchUi.View {
     function onUpdate(dc) as Void {
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK); dc.clear();
         var x = dc.getWidth() / 2;
-        dc.drawText(x, 35, Graphics.FONT_XTINY, "BACKUP / RESTORE", Graphics.TEXT_JUSTIFY_CENTER);
-        dc.drawText(x, 75, Graphics.FONT_XTINY, "Open", Graphics.TEXT_JUSTIFY_CENTER);
+        ScreenStyle.title(dc, "BACKUP / RESTORE");
+        dc.drawText(x, 100, Graphics.FONT_XTINY, "Open", Graphics.TEXT_JUSTIFY_CENTER);
         dc.setColor(AppTheme.color(), Graphics.COLOR_BLACK);
-        dc.drawText(x, 105, Graphics.FONT_XTINY, "backup.execureach.co", Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(x, 130, Graphics.FONT_XTINY, "backup.execureach.co", Graphics.TEXT_JUSTIFY_CENTER);
         if (!code.equals("")) {
             dc.setColor(Graphics.COLOR_ORANGE, Graphics.COLOR_BLACK);
-            dc.drawText(x, 145, Graphics.FONT_SMALL, code.substring(0, 6) + " " + code.substring(6, 12), Graphics.TEXT_JUSTIFY_CENTER);
+            dc.drawText(x, 170, Graphics.FONT_SMALL, code.substring(0, 6) + " " + code.substring(6, 12), Graphics.TEXT_JUSTIFY_CENTER);
         }
         dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
-        dc.drawText(x, 195, Graphics.FONT_XTINY, message, Graphics.TEXT_JUSTIFY_CENTER);
+        dc.drawText(x, 220, Graphics.FONT_XTINY, message, Graphics.TEXT_JUSTIFY_CENTER);
         dc.drawText(x, 310, Graphics.FONT_XTINY, busy ? "BACK to cancel" : "MENU to restore", Graphics.TEXT_JUSTIFY_CENTER);
     }
     function request(name as Lang.String, data as Lang.Dictionary) as Void {

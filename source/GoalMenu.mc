@@ -5,7 +5,7 @@ using Toybox.Lang;
 class GoalMenu extends WatchUi.Menu2 {
     var view;
     function initialize(view) {
-        Menu2.initialize({ :title => "Goal / Pacing" });
+        Menu2.initialize({ :title => new ScreenTitle("Goal / Pacing") });
         self.view = view;
         addItem(new WatchUi.MenuItem("Goal", null, :enabled, {}));
         addItem(new WatchUi.MenuItem("Target Reps", null, :target, {}));
