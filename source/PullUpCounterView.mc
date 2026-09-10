@@ -10,6 +10,9 @@ class PullUpCounterView extends WatchUi.View {
     var restSeconds = 0;
     var incrementAmount = 2;
     var restDuration = 45;
+    var workoutMode = "fixedRest";
+    var workoutGoal as Lang.Dictionary = WorkoutGoal.defaults();
+    var goalStart = 0;
     var settingsMenu = null;
     var restEndTime = 0;
     var history as Lang.Array = [];
@@ -50,6 +53,22 @@ class PullUpCounterView extends WatchUi.View {
         incrementAmount = preferences["increment"];
         restDuration = preferences["rest"];
         vibrationEnabled = preferences["vibration"];
+        workoutMode = preferences["mode"];
+        workoutGoal = preferences["goal"] as Lang.Dictionary;
+        if (workoutGoal["enabled"]) {
+            var goalInterval = WorkoutGoal.interval(
+                workoutGoal["reps"],
+                workoutGoal["seconds"],
+                incrementAmount
+            );
+            if (
+                !isInterval() ||
+                goalInterval < 1 ||
+                goalInterval != restDuration
+            ) {
+                throw new Lang.InvalidValueException("Invalid goal pace");
+            }
+        }
     }
     function onLayout(dc as Dc) as Void {}
 
@@ -119,10 +138,7 @@ class PullUpCounterView extends WatchUi.View {
         dc.setColor(cyan, Graphics.COLOR_TRANSPARENT);
         dc.drawText(x, 232, labelFont, "SET " + totalSets.format("%d"), align);
         if (restSeconds > 0) {
-            var timer =
-                (restSeconds / 60).format("%02d") +
-                ":" +
-                (restSeconds % 60).format("%02d");
+            var timer = DurationText.format(restSeconds);
             var restFont = timerFont;
             if (
                 dc.getTextWidthInPixels(timer, restFont) >
@@ -131,9 +147,38 @@ class PullUpCounterView extends WatchUi.View {
                 restFont = labelFont;
             }
             dc.drawText(x, 260, restFont, timer, align);
-            dc.drawText(x, 311, labelFont, "REST", align);
+            if (!workoutGoal["enabled"]) {
+                dc.drawText(
+                    x,
+                    311,
+                    labelFont,
+                    isInterval() ? "NEXT SET" : "REST",
+                    align
+                );
+            }
         } else {
-            dc.drawText(x, 280, labelFont, "READY", align);
+            dc.drawText(
+                x,
+                280,
+                labelFont,
+                isInterval() ? "START" : "READY",
+                align
+            );
+        }
+        if (workoutGoal["enabled"]) {
+            dc.drawText(
+                x,
+                313,
+                footerFont,
+                WorkoutGoal.status(
+                    workoutGoal,
+                    incrementAmount,
+                    goalStart,
+                    Time.now().value(),
+                    pullUps
+                ),
+                align
+            );
         }
         dc.setColor(0xaaaaaa, Graphics.COLOR_TRANSPARENT);
         dc.drawText(
@@ -143,8 +188,10 @@ class PullUpCounterView extends WatchUi.View {
             "+" +
                 incrementAmount.format("%d") +
                 " / " +
-                restDuration.format("%d") +
-                "s REST",
+                (restDuration < 3600
+                    ? restDuration.format("%d") + "s"
+                    : DurationText.format(restDuration)) +
+                (isInterval() ? " INTERVAL" : " REST"),
             align
         );
     }
@@ -175,14 +222,59 @@ class PullUpCounterView extends WatchUi.View {
     }
     function onHide() as Void {}
 
+    function isInterval() {
+        return workoutMode.equals("fixedInterval");
+    }
+    function timerSettingLabel() {
+        return isInterval() ? "Interval" : "Rest Time";
+    }
+    function modeLabel() {
+        return isInterval() ? "Fixed Interval" : "Fixed Rest";
+    }
+    function saveGoal(value) as Void {
+        workoutStore.storage.put("workoutGoal", value);
+        workoutGoal = value;
+    }
+    function stopTimer() as Void {
+        workoutStore.storage.put("goalStart", 0);
+        goalStart = 0;
+        workoutStore.storage.put("restEndTime", 0);
+        restEndTime = 0;
+        restSeconds = 0;
+    }
+    function selectMode(mode) as Void {
+        if (!mode.equals(workoutMode)) {
+            stopTimer();
+            workoutStore.storage.put("workoutMode", mode);
+            workoutMode = mode;
+        }
+    }
     function addPullUps() as Void {
+        recordSetAt(Time.now().value());
+    }
+
+    function recordSetAt(now) as Void {
         if (!ensureWorkoutReady()) {
             return;
         }
+        if (isInterval() && restEndTime == 0) {
+            if (workoutGoal["enabled"]) {
+                workoutStore.storage.put("goalStart", now);
+                goalStart = now;
+            }
+            restEndTime = now + restDuration;
+            restSeconds = restDuration;
+            workoutStore.storage.put("restEndTime", restEndTime);
+            WatchUi.requestUpdate();
+            return;
+        }
         pullUps += incrementAmount;
-        restSeconds = restDuration;
-
-        restEndTime = Time.now().value() + restDuration;
+        if (isInterval()) {
+            tickAt(now);
+        } else {
+            restSeconds = restDuration;
+            restEndTime = now + restDuration;
+        }
 
         totalSets += 1;
 
@@ -191,7 +283,7 @@ class PullUpCounterView extends WatchUi.View {
             "counter" => pullUps,
             "increment" => incrementAmount,
             "rest" => restDuration,
-            "timestamp" => Time.now().value(),
+            "timestamp" => now,
         };
 
         history.add(setEntry);
@@ -214,6 +306,11 @@ class PullUpCounterView extends WatchUi.View {
 
     function undoPullUps() as Void {
         if (!ensureWorkoutReady()) {
+            return;
+        }
+        if (isInterval() && history.size() == 0) {
+            stopTimer();
+            WatchUi.requestUpdate();
             return;
         }
         if (history.size() > 0) {
@@ -249,6 +346,8 @@ class PullUpCounterView extends WatchUi.View {
         if (!ensureWorkoutReady()) {
             return;
         }
+        workoutStore.storage.put("goalStart", 0);
+        goalStart = 0;
         pullUps = 0;
         restSeconds = 0;
         restEndTime = 0;
@@ -266,24 +365,25 @@ class PullUpCounterView extends WatchUi.View {
         WatchUi.requestUpdate();
     }
 
-    function tick() as Void {
-        if (!workoutReady) {
-            return;
+    function tick() {
+        return tickAt(Time.now().value());
+    }
+
+    // Advance directly to the next scheduled boundary, never invent missed sets.
+    function tickAt(now) {
+        if (!workoutReady || restEndTime == 0) {
+            return false;
         }
-        if (restEndTime > 0) {
-            var remaining = restEndTime - Time.now().value();
-
-            if (remaining > 0) {
-                restSeconds = remaining;
-            } else {
-                restSeconds = 0;
-                restEndTime = 0;
-
-                workoutStore.storage.put("restEndTime", 0);
-            }
-
-            WatchUi.requestUpdate();
+        var elapsed = now >= restEndTime;
+        if (elapsed) {
+            restEndTime = isInterval()
+                ? IntervalSchedule.nextEnd(restEndTime, restDuration, now)
+                : 0;
+            workoutStore.storage.put("restEndTime", restEndTime);
         }
+        restSeconds = restEndTime > 0 ? restEndTime - now : 0;
+        WatchUi.requestUpdate();
+        return elapsed;
     }
 
     function reloadCurrentWorkout() as Void {
@@ -292,7 +392,21 @@ class PullUpCounterView extends WatchUi.View {
         pullUps = saved["currentCounter"];
         totalSets = saved["totalSets"];
         restEndTime = saved["restEndTime"];
-        restSeconds = restEndTime - Time.now().value();
+        var savedStart = workoutStore.storage.get("goalStart");
+        goalStart = savedStart == null ? 0 : savedStart;
+        if (!(goalStart instanceof Lang.Number) || goalStart < 0) {
+            throw new Lang.InvalidValueException("Invalid goal start");
+        }
+        var now = Time.now().value();
+        if (isInterval() && restEndTime > 0 && restEndTime <= now) {
+            restEndTime = IntervalSchedule.nextEnd(
+                restEndTime,
+                restDuration,
+                now
+            );
+            workoutStore.storage.put("restEndTime", restEndTime);
+        }
+        restSeconds = restEndTime - now;
         if (restSeconds < 0) {
             restSeconds = 0;
         }

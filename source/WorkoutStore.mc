@@ -117,6 +117,7 @@ class WorkoutStore {
     }
 
     function clearCurrent() as Void {
+        storage.put("goalStart", 0);
         storage.put("pullUps", 0);
         storage.put("totalSets", 0);
         storage.put("restEndTime", 0);

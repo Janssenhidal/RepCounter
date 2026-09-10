@@ -29,13 +29,10 @@ class PullUpCounterApp extends Application.AppBase {
     }
 
     function onTimerTick() as Void {
-        var previous = mainView.restSeconds;
-
-        mainView.tick();
+        var boundaryReached = mainView.tick();
 
         if (
-            previous > 0 &&
-            mainView.restSeconds == 0 &&
+            boundaryReached &&
             mainView.vibrationEnabled
         ) {
             vibrate();

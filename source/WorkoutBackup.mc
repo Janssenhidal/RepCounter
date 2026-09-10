@@ -31,7 +31,9 @@ class WorkoutBackup {
             return { "kind" => "header", "format" => "pullupcounter.backup", "version" => 1,
                 "created" => Time.now().value(), "workouts" => store.count(),
                 "settings" => { "increment" => setting("incrementAmount", 2),
-                    "rest" => setting("restDuration", 45), "vibration" => setting("vibrationEnabled", true) },
+                    "rest" => setting("restDuration", 45), "vibration" => setting("vibrationEnabled", true),
+                    "mode" => setting("workoutMode", "fixedRest"),
+                    "goal" => WorkoutGoal.validate(store.storage.get("workoutGoal")) },
                 "current" => { "reps" => setting("pullUps", 0), "sets" => setting("totalSets", 0),
                     "rows" => active.size() } };
         }

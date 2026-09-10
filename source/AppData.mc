@@ -9,6 +9,11 @@ module AppData {
         var increment = backend.get("incrementAmount");
         var rest = backend.get("restDuration");
         var vibration = backend.get("vibrationEnabled");
+        var mode = backend.get("workoutMode");
+        if (mode == null) { mode = "fixedRest"; }
+        if (!(mode instanceof Lang.String) || !(mode.equals("fixedRest") || mode.equals("fixedInterval"))) {
+            throw new Lang.InvalidValueException("Invalid workout mode");
+        }
         if (increment == null) { increment = 2; }
         if (rest == null) { rest = 45; }
         if (vibration == null) { vibration = true; }
@@ -17,7 +22,7 @@ module AppData {
             !(vibration instanceof Lang.Boolean)) {
             throw new Lang.InvalidValueException("Invalid preferences");
         }
-        return { "increment" => increment, "rest" => rest, "vibration" => vibration };
+        return { "increment" => increment, "rest" => rest, "vibration" => vibration, "mode" => mode, "goal" => WorkoutGoal.validate(backend.get("workoutGoal")) };
     }
 
     function session(backend as WorkoutStorage) as Lang.Dictionary {

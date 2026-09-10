@@ -4,7 +4,7 @@ root=Path(__file__).resolve().parents[1]
 fonts=root/'design/fonts/Barlow_Condensed'
 out=root/'resources/fonts'
 out.mkdir(parents=True,exist_ok=True)
-variants=[('RepNumber','SemiBold',160,'0123456789'),('RepTimer','Medium',64,'0123456789:'),('RepLabel','Medium',28,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 +/:'),('RepFooter','Medium',22,'0123456789+/ sREST')]
+variants=[('RepNumber','SemiBold',160,'0123456789'),('RepTimer','Medium',64,'0123456789:'),('RepLabel','Medium',28,'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 +/:'),('RepFooter','Medium',22,'0123456789+/ sABCDEFGHIJKLMNOPQRSTUVWXYZ')]
 for name,weight,size,chars in variants:
     font=ImageFont.truetype(str(fonts/f'BarlowCondensed-{weight}.ttf'),size)
     boxes={c:font.getbbox(c) for c in chars}

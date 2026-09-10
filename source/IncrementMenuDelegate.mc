@@ -1,44 +1,21 @@
 using Toybox.WatchUi;
-using Toybox.Application;
 
-class IncrementMenuDelegate extends WatchUi.Menu2InputDelegate {
+// Save adapter for the shared two-digit reps editor.
+class IncrementMenuDelegate {
     var view;
     var settingsMenu;
-
     function initialize(view, settingsMenu) {
-        Menu2InputDelegate.initialize();
-
         self.view = view;
         self.settingsMenu = settingsMenu;
     }
-
-    function onSelect(item) as Void {
-        var id = item.getId();
-
-        if (id == :inc1) {
-            view.incrementAmount = 1;
-        } else if (id == :inc2) {
-            view.incrementAmount = 2;
-        } else if (id == :inc3) {
-            view.incrementAmount = 3;
-        } else if (id == :inc4) {
-            view.incrementAmount = 4;
-        } else if (id == :inc5) {
-            view.incrementAmount = 5;
+    function save(value) {
+        if (value < 1 || value > 99 || !view.ensureWorkoutReady()) { return false; }
+        view.workoutStore.storage.put("incrementAmount", value);
+        view.incrementAmount = value;
+        if (settingsMenu != null) {
+            settingsMenu.updateItem(new WatchUi.MenuItem("Reps per Set", value.format("%d"), :increment, {}), 1);
         }
-
-        view.workoutStore.storage.put("incrementAmount", view.incrementAmount);
-
-        // Refresh Reps per Set in Workout Settings
-        var updatedItem = new WatchUi.MenuItem(
-            "Reps per Set",
-            view.incrementAmount.format("%d"),
-            :increment,
-            {}
-        );
-
-        settingsMenu.updateItem(updatedItem, 0);
-
-        WatchUi.popView(WatchUi.SLIDE_RIGHT);
+        WatchUi.requestUpdate();
+        return true;
     }
 }

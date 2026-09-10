@@ -10,23 +10,103 @@ class PullUpCounterMenuDelegate extends WatchUi.Menu2InputDelegate {
     }
 
     function onSelect(item) as Void {
-        if (item.getId() != :backup && item.getId() != :data && !view.ensureWorkoutReady()) { return; }
-        if (item.getId() == :workoutSettings) {
+        if (
+            item.getId() != :backup &&
+            item.getId() != :data &&
+            !view.ensureWorkoutReady()
+        ) {
+            return;
+        }
+        if (
+            (view.workoutGoal as Toybox.Lang.Dictionary)["enabled"] &&
+            (item.getId() == :workoutMode ||
+                item.getId() == :increment ||
+                item.getId() == :restTime)
+        ) {
+            workoutMessage("Turn off Goal / Pacing\nto change these settings.");
+            return;
+        }
+        if (item.getId() == :goal) {
+            var goalMenu = new GoalMenu(view);
+            WatchUi.pushView(
+                goalMenu,
+                new GoalMenuDelegate(view, goalMenu),
+                WatchUi.SLIDE_LEFT
+            );
+        } else if (item.getId() == :workoutSettings) {
             var menu = new WatchUi.Menu2({ :title => "Workout Settings" });
-            menu.addItem(new WatchUi.MenuItem("Reps per Set", view.incrementAmount.format("%d"), :increment, {}));
-            var restText = (view.restDuration / 60).format("%d") + ":" + (view.restDuration % 60).format("%02d");
-            menu.addItem(new WatchUi.MenuItem("Rest Time", restText, :restTime, {}));
-            menu.addItem(new WatchUi.MenuItem("Vibration", view.vibrationEnabled ? "On" : "Off", :vibration, {}));
+            menu.addItem(
+                new WatchUi.MenuItem(
+                    "Workout Mode",
+                    view.modeLabel(),
+                    :workoutMode,
+                    {}
+                )
+            );
+            menu.addItem(
+                new WatchUi.MenuItem(
+                    "Reps per Set",
+                    view.incrementAmount.format("%d"),
+                    :increment,
+                    {}
+                )
+            );
+            var restText = DurationText.format(view.restDuration);
+            menu.addItem(
+                new WatchUi.MenuItem(
+                    view.timerSettingLabel(),
+                    restText,
+                    :restTime,
+                    {}
+                )
+            );
+            menu.addItem(
+                new WatchUi.MenuItem(
+                    "Vibration",
+                    view.vibrationEnabled ? "On" : "Off",
+                    :vibration,
+                    {}
+                )
+            );
+            if (view.isInterval()) {
+                menu.addItem(
+                    new WatchUi.MenuItem(
+                        "Goal / Pacing",
+                        (view.workoutGoal as Toybox.Lang.Dictionary)["enabled"]
+                            ? "On"
+                            : "Off",
+                        :goal,
+                        {}
+                    )
+                );
+            }
             if (view.totalSets >= 1) {
-                menu.addItem(new WatchUi.MenuItem("Reset Workout", null, :resetCounter, {}));
+                menu.addItem(
+                    new WatchUi.MenuItem(
+                        "Reset Workout",
+                        null,
+                        :resetCounter,
+                        {}
+                    )
+                );
             }
             // Setting pickers update this submenu when returning from a selection.
             view.settingsMenu = menu;
-            WatchUi.pushView(menu, new PullUpCounterMenuDelegate(view), WatchUi.SLIDE_LEFT);
+            WatchUi.pushView(
+                menu,
+                new PullUpCounterMenuDelegate(view),
+                WatchUi.SLIDE_LEFT
+            );
         } else if (item.getId() == :data) {
             var menu = new WatchUi.Menu2({ :title => "Data" });
-            menu.addItem(new WatchUi.MenuItem("Backup / Export", null, :backup, {}));
-            WatchUi.pushView(menu, new PullUpCounterMenuDelegate(view), WatchUi.SLIDE_LEFT);
+            menu.addItem(
+                new WatchUi.MenuItem("Backup / Export", null, :backup, {})
+            );
+            WatchUi.pushView(
+                menu,
+                new PullUpCounterMenuDelegate(view),
+                WatchUi.SLIDE_LEFT
+            );
         } else if (item.getId() == :backup) {
             if (BackupConfig.URL.equals("")) {
                 workoutMessage("Backup service\nnot configured yet.");
@@ -34,52 +114,55 @@ class PullUpCounterMenuDelegate extends WatchUi.Menu2InputDelegate {
             }
             try {
                 var transfer = new BackupTransfer(view);
-                WatchUi.pushView(transfer, new BackupTransferDelegate(transfer), WatchUi.SLIDE_UP);
-            } catch (error) { workoutMessage("Cannot start backup."); }
-        } else if (item.getId() == :increment) {
-            var menu = new WatchUi.Menu2({
-                :title => "Reps per Set",
-            });
-
-            menu.addItem(new WatchUi.MenuItem("1", null, :inc1, {}));
-
-            menu.addItem(new WatchUi.MenuItem("2", null, :inc2, {}));
-
-            menu.addItem(new WatchUi.MenuItem("3", null, :inc3, {}));
-
-            menu.addItem(new WatchUi.MenuItem("4", null, :inc4, {}));
-
-            menu.addItem(new WatchUi.MenuItem("5", null, :inc5, {}));
-
+                WatchUi.pushView(
+                    transfer,
+                    new BackupTransferDelegate(transfer),
+                    WatchUi.SLIDE_UP
+                );
+            } catch (error) {
+                workoutMessage("Cannot start backup.");
+            }
+        } else if (item.getId() == :workoutMode) {
+            var menu = new WatchUi.Menu2({ :title => "Workout Mode" });
+            menu.addItem(
+                new WatchUi.MenuItem("Fixed Rest", null, :fixedRest, {})
+            );
+            menu.addItem(
+                new WatchUi.MenuItem(
+                    "Fixed Interval",
+                    "EMOM",
+                    :fixedInterval,
+                    {}
+                )
+            );
             WatchUi.pushView(
                 menu,
-                new IncrementMenuDelegate(view, view.settingsMenu),
+                new WorkoutModeMenuDelegate(view),
+                WatchUi.SLIDE_LEFT
+            );
+        } else if (item.getId() == :increment) {
+            var editor = new RepsEditor(
+                "REPS PER SET",
+                view.incrementAmount,
+                2,
+                new IncrementMenuDelegate(view, view.settingsMenu)
+            );
+            WatchUi.pushView(
+                editor,
+                new RepsEditorDelegate(editor),
                 WatchUi.SLIDE_LEFT
             );
         } else if (item.getId() == :restTime) {
-            var menu = new WatchUi.Menu2({
-                :title => "Rest Time",
-            });
-
-            menu.addItem(new WatchUi.MenuItem("15 seconds", null, :rest15, {}));
-
-            menu.addItem(new WatchUi.MenuItem("30 seconds", null, :rest30, {}));
-
-            menu.addItem(new WatchUi.MenuItem("45 seconds", null, :rest45, {}));
-
-            menu.addItem(new WatchUi.MenuItem("1:00", null, :rest60, {}));
-
-            menu.addItem(new WatchUi.MenuItem("1:15", null, :rest75, {}));
-
-            menu.addItem(new WatchUi.MenuItem("1:30", null, :rest90, {}));
-
-            menu.addItem(new WatchUi.MenuItem("2:00", null, :rest120, {}));
-
-            menu.addItem(new WatchUi.MenuItem("3:00", null, :rest180, {}));
-
+            var editor = new DurationEditor(
+                view.restDuration,
+                new RestTimeMenuDelegate(view, view.settingsMenu)
+            );
+            if (!view.isInterval()) {
+                editor.useMinutes();
+            }
             WatchUi.pushView(
-                menu,
-                new RestTimeMenuDelegate(view, view.settingsMenu),
+                editor,
+                new DurationEditorDelegate(editor),
                 WatchUi.SLIDE_LEFT
             );
         } else if (item.getId() == :vibration) {
@@ -96,15 +179,25 @@ class PullUpCounterMenuDelegate extends WatchUi.Menu2InputDelegate {
                 :vibration,
                 {}
             );
-            view.settingsMenu.updateItem(updatedItem, 2);
+            view.settingsMenu.updateItem(updatedItem, 3);
         } else if (item.getId() == :history) {
-            if (!view.ensureWorkoutReady()) { return; }
+            if (!view.ensureWorkoutReady()) {
+                return;
+            }
             try {
                 var historyMenu = new WorkoutHistoryMenu(view);
-                WatchUi.pushView(historyMenu, new WorkoutHistoryMenuDelegate(historyMenu), WatchUi.SLIDE_LEFT);
-            } catch (error) { workoutMessage("Cannot open history.\nPlease try again."); }
+                WatchUi.pushView(
+                    historyMenu,
+                    new WorkoutHistoryMenuDelegate(historyMenu),
+                    WatchUi.SLIDE_LEFT
+                );
+            } catch (error) {
+                workoutMessage("Cannot open history.\nPlease try again.");
+            }
         } else if (item.getId() == :finishWorkout) {
-            if (view.finishWorkout()) { WatchUi.popView(WatchUi.SLIDE_DOWN); }
+            if (view.finishWorkout()) {
+                WatchUi.popView(WatchUi.SLIDE_DOWN);
+            }
         } else if (item.getId() == :resetCounter) {
             view.resetCounter();
 
@@ -114,5 +207,3 @@ class PullUpCounterMenuDelegate extends WatchUi.Menu2InputDelegate {
         }
     }
 }
-
-
